@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 const Header = ({ title }) => {
-  // console.log(props)
   return (
   <h1>
     {title}
@@ -17,10 +16,19 @@ const Button = ( { handleClick, text } ) => {
     )
 }
 
+const StatisticLine =  ( { text, value } ) => {
+  return (
+          <tr>
+            <td>{ text }
+            </td>
+            <td>{ value }</td>
+          </tr>
+        )
+}
+
 const Statistics = ( { stats }) => {
   const all = stats.reduce((partialSum, a) => partialSum + a.amount, 0)
   let average = 0
-  let positive = 0
   stats.forEach(stat => {
     if (stat.type === "good")
       {
@@ -31,19 +39,38 @@ const Statistics = ( { stats }) => {
         average += (stat.amount * -1)
       }
     })
-    if (all > 0) { 
+    if (all > 0) {
       average = average / all
-      positive = stats[0].amount/all * 100 }
+      const positive = stats[0].amount/all * 100 
   return (
-    <div>
-      <p>{stats[0].type} {stats[0].amount}</p>
-      <p>{stats[1].type} {stats[1].amount}</p>
-      <p>{stats[2].type} {stats[2].amount}</p>
-      <p>all { all }</p>
-      <p>average { average }</p>
-      <p>positive { positive } %</p>
-    </div>
+    <table>
+      <tbody>
+        <StatisticLine text={stats[0].type} value={stats[0].amount} />
+        <StatisticLine text={stats[1].type} value={stats[1].amount} />
+        <StatisticLine text={stats[2].type} value={stats[2].amount} />
+        <tr>
+          <td>all</td>
+          <td>{ all }</td>
+        </tr>
+        <tr>
+          <td>average</td>
+          <td>{ average }</td>
+        </tr>
+        <tr>
+          <td>positive</td>
+          <td>{ positive } %</td>
+        </tr>
+      </tbody>
+    </table>
     )
+  }
+  else {
+    return (
+      <div>
+        No feedback given
+      </div>
+      )
+  }
 }
 
 const App = () => {
