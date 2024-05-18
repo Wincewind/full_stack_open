@@ -1,6 +1,31 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+
+const Notification = ({ message, isError }) => {
+  const notificationStyle = {
+    background: "lightgrey",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  notificationStyle.color = isError ? "red" : "green"
+
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
+
 const Contacts = ({ persons, removePerson }) => {
   return (
     <div>
@@ -11,11 +36,11 @@ const Contacts = ({ persons, removePerson }) => {
   )
 }
 
-const Contact = ({ person, removePerson }) => 
-<div>
-  {person.name} {person.number}  <button onClick={() =>
-    removePerson(person.id)}>delete</button>
-</div>
+const Contact = ({ person, removePerson }) =>
+  <div>
+    {person.name} {person.number}  <button onClick={() =>
+      removePerson(person.id)}>delete</button>
+  </div>
 
 const Filter = ({ handleFilterChange, filterString }) =>
   <form>
@@ -40,37 +65,52 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterString, setNewFilter] = useState('')
+  const [notificationMsg, setNotificationMsg] = useState({ msg: null, isError: true })
 
   useEffect(() => {
     personService
-    .getAll()
-    .then(initialPersons => {
-      setPersons(initialPersons)
-    })
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
   }, [])
+
+  const flashNotificationMsg = (msg, isError) => {
+    setNotificationMsg(
+      { msg, isError }
+    )
+    setTimeout(() => {
+      setNotificationMsg({ msg: null, isError: isError })
+    }, 5000)
+  }
 
   const addContact = (event) => {
     event.preventDefault()
     if (!persons.map(person => person.name).includes(newName)) {
       const contactObj = { name: newName, number: newNumber }
       personService
-      .create(contactObj)
-      .then(returnedContact => {
-        setPersons(persons.concat(returnedContact))
-        setNewFilter('')
-      })
+        .create(contactObj)
+        .then(returnedContact => {
+          setPersons(persons.concat(returnedContact))
+          setNewFilter('')
+        })
+      flashNotificationMsg(`Added ${newName}`, false)
     }
     else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const person = persons.find(p => p.name === newName)
-        const changedPerson = {...person, number: newNumber} 
+        const changedPerson = { ...person, number: newNumber }
 
         personService
-      .update(changedPerson.id, changedPerson)
-      .then(returnedPerson => {
-        console.log("updated", returnedPerson)
-        setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
-      })
+          .update(changedPerson.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+            flashNotificationMsg(`Updated ${newName}`, false)
+          })
+          .catch(error => {
+            flashNotificationMsg(`Information of ${newName} has already been removed from server`, true)
+            setPersons(persons.filter(p => p.id !== changedPerson.id))
+          })
       }
     }
     setNewName('')
@@ -90,18 +130,22 @@ const App = () => {
   }
 
   const removePerson = id => {
-    if (window.confirm(`Delete ${persons.find(p => p.id === id).name} ?`)) {
+    const personToRemove = persons.find(p => p.id === id)
+    if (window.confirm(`Delete ${personToRemove.name} ?`)) {
       personService
-    .remove(id)
-    .then(removedPerson => {
-      console.log("removed", removedPerson)
-      setPersons(persons.filter(p => p.id !== id))
-    })
+        .remove(id)
+        .then(removedPerson => {
+          console.log("removed", removedPerson)
+          setPersons(persons.filter(p => p.id !== id))
+          flashNotificationMsg(`Deleted ${personToRemove.name}`, false)
+        })
     }
   }
 
+
   return (
     <div>
+      <Notification message={notificationMsg.msg} isError={notificationMsg.isError} />
       <h2>Phonebook</h2>
       <Filter handleFilterChange={handleFilterChange} filterString={filterString} />
       <h3>add a new</h3>
