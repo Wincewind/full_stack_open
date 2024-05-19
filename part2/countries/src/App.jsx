@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import countriesService from './services/countries'
+import weatherService from './services/weather'
+import weather from './services/weather'
 
 const Filter = ({ handleFilterChange, filterString }) =>
   <form>
@@ -42,11 +44,24 @@ const CountryDetails = ({ selectedCountry }) => {
     )
 }
 
+const Weather = ({ capitalName, capitalWeather }) => {
+  if (capitalWeather)
+    return (
+      <div>
+        <h2>Weather in {capitalName}</h2>
+        <div>temperature {capitalWeather.main.temp} Celcius</div>
+        <img src={`https://openweathermap.org/img/wn/${capitalWeather.weather[0].icon}@2x.png`} />
+        <div>wind {capitalWeather.wind.speed} m/s</div>
+      </div>
+    )
+}
+
 function App() {
   const [allCountries, setAllCountries] = useState([])
   const [matchingCountries, setMatchingCountries] = useState([])
   const [selectedCountry, setCountry] = useState(null)
   const [filterString, setNewFilter] = useState('')
+  const [capitalWeather, setCapitalWeather] = useState(null)
 
 
   useEffect(() => {
@@ -57,6 +72,16 @@ function App() {
       })
   }, [])
 
+  useEffect(() => {
+    if (selectedCountry) {
+      weatherService
+      .getWeather(selectedCountry.capital)
+      .then(weatherData => {
+        setCapitalWeather(weatherData)
+      })
+    }
+  }, [selectedCountry])
+
   const handleFilterChange = (event) => {
     const newFilter = event.target.value
     setNewFilter(newFilter)
@@ -66,6 +91,7 @@ function App() {
       getSpecificCountryDetails(newFilteredCountries[0])
     else
       setCountry(null)
+      setCapitalWeather(null)
   }
 
   const getSpecificCountryDetails = name => {
@@ -81,6 +107,7 @@ function App() {
       <Filter handleFilterChange={handleFilterChange} filterString={filterString} />
       <CountryList matchingCountries={matchingCountries} handleCountrySelection={getSpecificCountryDetails} />
       <CountryDetails selectedCountry={selectedCountry} />
+      <Weather capitalName={selectedCountry !== null ? selectedCountry.capital : null} capitalWeather={capitalWeather}/>
     </div>
   )
 }
