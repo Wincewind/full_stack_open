@@ -1,7 +1,15 @@
 const express = require('express')
+var morgan = require('morgan')
+
 const app = express()
 
+morgan.token('new_person', function (req, res) {
+    if (req.method === 'POST' && req.url.endsWith('persons'))
+        return JSON.stringify(req.body)
+})
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :new_person'))
 
 let persons = [
     {
@@ -58,8 +66,6 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    console.log(body);
-    
     
     if (!body.name || !body.number) {
         return response.status(400).json({
