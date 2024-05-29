@@ -93,8 +93,10 @@ const App = () => {
         .then(returnedContact => {
           setPersons(persons.concat(returnedContact))
           setNewFilter('')
+          flashNotificationMsg(`Added ${newName}`, false)
         })
-      flashNotificationMsg(`Added ${newName}`, false)
+        .catch(error => {
+          flashNotificationMsg(`${error.response.data.error}`, true)})
     }
     else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {

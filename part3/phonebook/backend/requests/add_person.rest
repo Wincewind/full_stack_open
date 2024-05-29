@@ -1,4 +1,4 @@
-POST https://wincewind-phonebook.fly.dev/api/persons
+POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
