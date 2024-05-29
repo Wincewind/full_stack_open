@@ -96,7 +96,8 @@ const App = () => {
           flashNotificationMsg(`Added ${newName}`, false)
         })
         .catch(error => {
-          flashNotificationMsg(`${error.response.data.error}`, true)})
+          flashNotificationMsg(`${error.response.data.error}`, true)
+        })
     }
     else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
@@ -110,8 +111,13 @@ const App = () => {
             flashNotificationMsg(`Updated ${newName}`, false)
           })
           .catch(error => {
-            flashNotificationMsg(`Information of ${newName} has already been removed from server`, true)
-            setPersons(persons.filter(p => p.id !== changedPerson.id))
+            if (error.response.status === 404) {
+              setPersons(persons.filter(p => p.id !== changedPerson.id))
+              flashNotificationMsg(`Information of ${newName} has already been removed from server`, true)
+            }
+            else {
+              flashNotificationMsg(`${error.response.data.error}`, true)
+            }
           })
       }
     }
@@ -137,7 +143,6 @@ const App = () => {
       personService
         .remove(id)
         .then(removedPerson => {
-          console.log("removed", removedPerson)
           setPersons(persons.filter(p => p.id !== id))
           flashNotificationMsg(`Deleted ${personToRemove.name}`, false)
         })
