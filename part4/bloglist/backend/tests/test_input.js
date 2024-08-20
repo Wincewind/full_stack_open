@@ -1,4 +1,4 @@
-const list_of_blogs = [
+const listOfBlogs = [
     {
       _id: "5a422a851b54a676234d17f7",
       title: "React patterns",
@@ -78,5 +78,5 @@ const listWithTwoBlogs = [
 ]
 
 module.exports = {
-    list_of_blogs, listWithOneBlog, listWithTwoBlogs
+    listOfBlogs, listWithOneBlog, listWithTwoBlogs
 }
