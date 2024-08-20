@@ -111,3 +111,47 @@ describe('most blogs', () => {
     )
   })
 })
+
+describe('most likes', () => {
+
+  test('gotten author is found from a list of blogs', () => {
+    const result = listHelper.mostLikes(test_inputs.listOfBlogs)
+    assert.deepStrictEqual(
+      result,
+      {
+        author: "Edsger W. Dijkstra",
+        likes: 17
+      }
+    )
+  })
+
+  test('gotten author is found from a list of two blogs with different authors', () => {
+    const result = listHelper.mostLikes(test_inputs.listWithTwoBlogs)
+    assert.deepStrictEqual(
+      result,
+      {
+        author: "Reactor",
+        likes: 15
+      }
+    )
+  })
+
+  test('gotten author is found from a list of one blog', () => {
+    const result = listHelper.mostLikes(test_inputs.listWithOneBlog)
+    assert.deepStrictEqual(
+      result,
+      {
+        author: "Edsger W. Dijkstra",
+        likes: 5
+      }
+    )
+  })
+
+  test('gotten author is returned as null if the blog list is empty', () => {
+    const result = listHelper.mostLikes([])
+    assert.deepStrictEqual(
+      result,
+      null
+    )
+  })
+})

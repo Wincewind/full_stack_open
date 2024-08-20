@@ -24,12 +24,27 @@ const blogsByAuthor = (blogs) => {
     }))
 }
 
+const likesByAuthor = (blogs) => {
+    const authorGroupedBlogs = groupBy(blogs, ({ author }) => author)
+    return Object.keys(authorGroupedBlogs).map(
+        key => ({
+        author: key,
+        likes: totalLikes(authorGroupedBlogs[key])
+    }))
+}
+
 const mostBlogs = (blogs) => {
     return blogs.length === 0
     ? null
     : blogsByAuthor(blogs).reduce((a, b) => (a.blogs > b.blogs) ? a : b, -Infinity)
 }
+
+const mostLikes = (blogs) => {
+    return blogs.length === 0
+    ? null
+    : likesByAuthor(blogs).reduce((a, b) => (a.likes > b.likes) ? a : b, -Infinity)
+}
   
 module.exports = {
-dummy, totalLikes, favoriteBlog, mostBlogs
+dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
