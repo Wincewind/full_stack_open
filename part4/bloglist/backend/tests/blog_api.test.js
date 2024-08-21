@@ -54,6 +54,20 @@ describe("blog api", () => {
         assert.deepStrictEqual(newBlog, lastAddedBlog)
     })
 
+    test('will set a new blog\'s likes to zero if the property isn\'t provided', async () => {
+        const newBlog = {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+        }
+        
+        await api.post('/api/blogs').send(newBlog)
+        const response = await api.get('/api/blogs')
+        const lastAddedBlog = response.body.slice(-1)[0]
+
+        assert.strictEqual(lastAddedBlog.likes, 0)
+    })
+
     after(async () => {
         await mongoose.connection.close()
       })
