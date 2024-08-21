@@ -31,8 +31,9 @@ describe("blog api", () => {
 
         assert(Object.hasOwn(firstBlog,'id'))
     })
+    describe("adding a new blog", () => {
 
-    test('can be used to add new valid blogs', async () => {
+    test('succeeds with valid data', async () => {
         const newBlog = {
             title: 'Go To Statement Considered Harmful',
             author: 'Edsger W. Dijkstra',
@@ -54,7 +55,7 @@ describe("blog api", () => {
         assert.deepStrictEqual(newBlog, lastAddedBlog)
     })
 
-    test('will set a new blog\'s likes to zero if the property isn\'t provided', async () => {
+    test('will succeed even if likes are missing and they\'ll be set to zero', async () => {
         const newBlog = {
             title: 'Go To Statement Considered Harmful',
             author: 'Edsger W. Dijkstra',
@@ -68,29 +69,12 @@ describe("blog api", () => {
         assert.strictEqual(lastAddedBlog.likes, 0)
     })
 
-    test('will return status 400 if blogs title or url are missing', async () => {
+    test('will fail with status 400 if title is missing', async () => {
         const newBlog = {
-            title: 'Go To Statement Considered Harmful',
             author: 'Edsger W. Dijkstra',
-            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5
         }
-        
-        delete newBlog.title
-
-        await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-
-        newBlog.title = 'New title'
-        delete newBlog.url
-
-        await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
-
-        delete newBlog.title
 
         await api
         .post('/api/blogs')
@@ -98,8 +82,35 @@ describe("blog api", () => {
         .expect(400)
     })
 
-    after(async () => {
-        await mongoose.connection.close()
-      })
+    test('will fail with status 400 if url is missing', async () => {
+        const newBlog = {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            likes: 5
+        }
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    })
+
+    test('will fail with status 400 if title and url is missing', async () => {
+        const newBlog = {
+            author: 'Edsger W. Dijkstra',
+            likes: 5
+        }
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    })
+    
+})
 
 })
+
+after(async () => {
+    await mongoose.connection.close()
+  })
