@@ -29,7 +29,7 @@ describe("blog api", () => {
         const response = await api.get('/api/blogs')
         const firstBlog = response.body[0]
 
-        assert(Object.keys(firstBlog).includes('id'))
+        assert(Object.hasOwn(firstBlog,'id'))
     })
 
     test('can be used to add new valid blogs', async () => {
@@ -66,6 +66,36 @@ describe("blog api", () => {
         const lastAddedBlog = response.body.slice(-1)[0]
 
         assert.strictEqual(lastAddedBlog.likes, 0)
+    })
+
+    test('will return status 400 if blogs title or url are missing', async () => {
+        const newBlog = {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
+        }
+        
+        delete newBlog.title
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+        newBlog.title = 'New title'
+        delete newBlog.url
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+        delete newBlog.title
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
     })
 
     after(async () => {
