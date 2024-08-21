@@ -127,8 +127,23 @@ describe('deletion of a blog', () => {
     })
   })
 
-})
+  describe('updating a blog\'s likes', () => {
+    test('succeeds if id is valid', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToUpdate = blogsAtStart[0]
+        blogToUpdate.likes = Date.now()
+  
+        updatedBlog = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(blogToUpdate)
 
+        const blogsAfterUpdate = await helper.blogsInDb()
+  
+        assert.strictEqual(updatedBlog.body.likes, blogsAfterUpdate[0].likes)
+      })
+  })
+
+})
 
 after(async () => {
     await mongoose.connection.close()
