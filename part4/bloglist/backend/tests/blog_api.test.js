@@ -17,22 +17,41 @@ describe("blog api", () => {
 
     test('returns all the blogs as json', async () => {
         const blogsAtStart = await helper.blogsInDb()
-        const result = await api
+        const response = await api
         .get('/api/blogs')
-        .expect(201)
+        .expect(200)
         .expect('Content-Type', /application\/json/)
 
-        assert.strictEqual(result.body.length, blogsAtStart.length)
+        assert.strictEqual(response.body.length, blogsAtStart.length)
     })
 
     test('returns blogs with identifier named \'id\'', async () => {
-        const result = await api
-        .get('/api/blogs')
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
-        const firstBlog = result.body[0]
+        const response = await api.get('/api/blogs')
+        const firstBlog = response.body[0]
 
         assert(Object.keys(firstBlog).includes('id'))
+    })
+
+    test('can be used to add new valid blogs', async () => {
+        const newBlog = {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+            likes: 5
+        }
+        
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+        
+        const response = await api.get('/api/blogs')
+        const lastAddedBlog = response.body.slice(-1)[0]
+        delete lastAddedBlog.id
+
+        assert.strictEqual(response.body.length, helper.listOfBlogs.length + 1)
+        assert.deepStrictEqual(newBlog, lastAddedBlog)
     })
 
     after(async () => {
