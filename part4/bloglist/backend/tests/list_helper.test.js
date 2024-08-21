@@ -1,7 +1,7 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
-const test_inputs = require('./test_input')
+const helper = require('./test_helper')
 
 test('dummy returns one', () => {
   const blogs = []
@@ -13,7 +13,7 @@ test('dummy returns one', () => {
 describe('total likes', () => {
 
   test('when list has only one blog equals the likes of that', () => {
-    const result = listHelper.totalLikes(test_inputs.listWithOneBlog)
+    const result = listHelper.totalLikes(helper.listWithOneBlog)
     assert.strictEqual(result, 5)
   })
 
@@ -23,7 +23,7 @@ describe('total likes', () => {
   })
 
   test('when list has several blogs equals the likes the sum', () => {
-    const result = listHelper.totalLikes(test_inputs.listOfBlogs)
+    const result = listHelper.totalLikes(helper.listOfBlogs)
     assert.strictEqual(result, 36)
   })
 
@@ -32,12 +32,12 @@ describe('total likes', () => {
 describe('favourite blog', () => {
 
   test('is chosen from a list of two blogs', () => {
-    const result = listHelper.favoriteBlog(test_inputs.listWithTwoBlogs)
-    assert.deepStrictEqual(result, test_inputs.listWithTwoBlogs[1])
+    const result = listHelper.favoriteBlog(helper.listWithTwoBlogs)
+    assert.deepStrictEqual(result, helper.listWithTwoBlogs[1])
   })
 
   test('is chosen from a list of several blogs', () => {
-    const result = listHelper.favoriteBlog(test_inputs.listOfBlogs)
+    const result = listHelper.favoriteBlog(helper.listOfBlogs)
     assert.deepStrictEqual(result, 
       {
       _id: "5a422b3a1b54a676234d17f9",
@@ -50,7 +50,7 @@ describe('favourite blog', () => {
   })
 
   test('is chosen from a list of one blog', () => {
-    const result = listHelper.favoriteBlog(test_inputs.listWithOneBlog)
+    const result = listHelper.favoriteBlog(helper.listWithOneBlog)
     assert.deepStrictEqual(result, 
       {
         _id: '5a422aa71b54a676234d17f8',
@@ -71,7 +71,7 @@ describe('favourite blog', () => {
 describe('most blogs', () => {
 
   test('written author is found from a list of blogs', () => {
-    const result = listHelper.mostBlogs(test_inputs.listOfBlogs)
+    const result = listHelper.mostBlogs(helper.listOfBlogs)
     assert.deepStrictEqual(
       result,
       {
@@ -82,7 +82,7 @@ describe('most blogs', () => {
   })
 
   test('written author is found from a list of two blogs with different authors', () => {
-    const result = listHelper.mostBlogs(test_inputs.listWithTwoBlogs)
+    const result = listHelper.mostBlogs(helper.listWithTwoBlogs)
     assert.deepStrictEqual(
       result,
       {
@@ -93,7 +93,7 @@ describe('most blogs', () => {
   })
 
   test('written author is found from a list of one blog', () => {
-    const result = listHelper.mostBlogs(test_inputs.listWithOneBlog)
+    const result = listHelper.mostBlogs(helper.listWithOneBlog)
     assert.deepStrictEqual(
       result,
       {
@@ -115,7 +115,7 @@ describe('most blogs', () => {
 describe('most likes', () => {
 
   test('gotten author is found from a list of blogs', () => {
-    const result = listHelper.mostLikes(test_inputs.listOfBlogs)
+    const result = listHelper.mostLikes(helper.listOfBlogs)
     assert.deepStrictEqual(
       result,
       {
@@ -126,7 +126,7 @@ describe('most likes', () => {
   })
 
   test('gotten author is found from a list of two blogs with different authors', () => {
-    const result = listHelper.mostLikes(test_inputs.listWithTwoBlogs)
+    const result = listHelper.mostLikes(helper.listWithTwoBlogs)
     assert.deepStrictEqual(
       result,
       {
@@ -137,7 +137,7 @@ describe('most likes', () => {
   })
 
   test('gotten author is found from a list of one blog', () => {
-    const result = listHelper.mostLikes(test_inputs.listWithOneBlog)
+    const result = listHelper.mostLikes(helper.listWithOneBlog)
     assert.deepStrictEqual(
       result,
       {
