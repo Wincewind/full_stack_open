@@ -52,7 +52,7 @@ describe("blog api", () => {
         delete lastAddedBlog.id
 
         assert.strictEqual(response.body.length, helper.listOfBlogs.length + 1)
-        assert.deepStrictEqual(newBlog, lastAddedBlog)
+        assert.deepStrictEqual({...newBlog, user: null}, lastAddedBlog)
     })
 
     test('will succeed even if likes are missing and they\'ll be set to zero', async () => {
