@@ -9,8 +9,6 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
 
-  if (Object.hasOwn(body, 'title') && Object.hasOwn(body, 'url')) {
-
     const blog = new Blog({
       title: body.title,
       author: body.author,
@@ -20,10 +18,6 @@ blogsRouter.post('/', async (request, response) => {
     
     const savedBlog = await blog.save()
     response.status(201).json(savedBlog)
-  }
-  else {
-    response.status(400).end()
-  }
 })
 
 blogsRouter.delete('/:id', async(request, response) => {
