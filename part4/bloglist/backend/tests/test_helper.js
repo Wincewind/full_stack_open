@@ -73,10 +73,10 @@ const listWithTwoBlogs = [
     __v: 0
 },
 {
-    "title": "Read Brandon Sanderson’s Wind and Truth Here on Reactor, Starting in July",
-    "author": "Reactor",
-    "url": "https://reactormag.com/read-brandon-sandersons-wind-and-truth-here-on-reactor/",
-    "likes": 15
+    title: "Read Brandon Sanderson’s Wind and Truth Here on Reactor, Starting in July",
+    author: "Reactor",
+    url: "https://reactormag.com/read-brandon-sandersons-wind-and-truth-here-on-reactor/",
+    likes: 15
 }
 ]
 

@@ -1,5 +1,7 @@
 const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -7,12 +9,25 @@ const api = supertest(app)
 
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 describe("blog api", () => {
+    let token;
+    let blogUserData;
 
     beforeEach(async () => {
         await Blog.deleteMany({})
-        await Blog.insertMany(helper.listOfBlogs)
+        await User.deleteMany({})
+
+        const passwordHash = await bcrypt.hash('Swordfish', 10)
+        const user = new User({ username: 'Wincewind', passwordHash })
+        await user.save()
+
+        const blogs = helper.listOfBlogs.map(blog => ({...blog, user: user._id.toString()}))        
+        await Blog.insertMany(blogs)
+        
+        blogUserData = {username: user.username, id: user._id.toString()}
+        token = jwt.sign(blogUserData, process.env.SECRET, { expiresIn: 60*60 })
       })
 
     test('returns all the blogs as json', async () => {
@@ -44,6 +59,7 @@ describe("blog api", () => {
         await api
         .post('/api/blogs')
         .send(newBlog)
+        .set({ Authorization: "Bearer " + token })
         .expect(201)
         .expect('Content-Type', /application\/json/)
         
@@ -52,7 +68,7 @@ describe("blog api", () => {
         delete lastAddedBlog.id
 
         assert.strictEqual(response.body.length, helper.listOfBlogs.length + 1)
-        assert.deepStrictEqual({...newBlog, user: null}, lastAddedBlog)
+        assert.deepStrictEqual({...newBlog, user: blogUserData}, lastAddedBlog)
     })
 
     test('will succeed even if likes are missing and they\'ll be set to zero', async () => {
@@ -62,7 +78,10 @@ describe("blog api", () => {
             url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html'
         }
         
-        await api.post('/api/blogs').send(newBlog)
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({ Authorization: "Bearer " + token })
         const response = await api.get('/api/blogs')
         const lastAddedBlog = response.body.slice(-1)[0]
 
@@ -78,6 +97,7 @@ describe("blog api", () => {
 
         await api
         .post('/api/blogs')
+        .set({ Authorization: "Bearer " + token })
         .send(newBlog)
         .expect(400)
     })
@@ -91,6 +111,7 @@ describe("blog api", () => {
 
         await api
         .post('/api/blogs')
+        .set({ Authorization: "Bearer " + token })
         .send(newBlog)
         .expect(400)
     })
@@ -103,8 +124,21 @@ describe("blog api", () => {
 
         await api
         .post('/api/blogs')
+        .set({ Authorization: "Bearer " + token })
         .send(newBlog)
         .expect(400)
+    })
+
+    test('will fail with status 401 if token isn\'t provided', async () => {
+        const newBlog = {
+            author: 'Edsger W. Dijkstra',
+            likes: 5
+        }
+
+        await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
     })
     
 })
@@ -116,6 +150,7 @@ describe('deletion of a blog', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set({ Authorization: "Bearer " + token })
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
@@ -124,6 +159,15 @@ describe('deletion of a blog', () => {
 
       const ids = blogsAtEnd.map(r => r.id)
       assert(!ids.includes(blogToDelete.id))
+    })
+
+    test('will fail with status 401 if token isn\'t provided', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(401)
     })
   })
 
@@ -146,5 +190,6 @@ describe('deletion of a blog', () => {
 })
 
 after(async () => {
+    await User.deleteMany({})
     await mongoose.connection.close()
   })

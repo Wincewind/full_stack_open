@@ -77,5 +77,6 @@ describe("creating a new user", () => {
 })
 
 after(async () => {
+    await User.deleteMany({})
     await mongoose.connection.close()
   })
