@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Blog, BlogForm } from './components/Blog'
 import LoginForm from './components/Login'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -10,6 +11,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [newBlog, setNewBlog] = useState({ title: '', author: '', url: '' })
+  const [notificationMsg, setNotificationMsg] = useState({ msg: null, isError: true })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -26,6 +28,15 @@ const App = () => {
     }
   }, [])
 
+  const flashNotificationMsg = (msg, isError) => {
+    setNotificationMsg(
+      { msg, isError }
+    )
+    setTimeout(() => {
+      setNotificationMsg({ msg: null, isError: isError })
+    }, 5000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -41,7 +52,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log('login error!')
+      flashNotificationMsg(`wrong username or password`, true)
     }
   }
 
@@ -58,12 +69,14 @@ const addBlog = async (event) => {
   const addedBlog = await blogService.create(newBlog)
   setBlogs(blogs.concat(addedBlog))
   setNewBlog({ title: '', author: '', url: '' })
+  flashNotificationMsg(`a new blog '${addedBlog.title}' by '${addedBlog.author}' added`, false)
 }
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
+        <Notification message={notificationMsg.msg} isError={notificationMsg.isError} />
         <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} />
       </div>
     )
@@ -72,6 +85,7 @@ const addBlog = async (event) => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={notificationMsg.msg} isError={notificationMsg.isError} />
       <div>{user.name} logged in
         <button onClick={handleLogout} >logout</button>
       </div>
