@@ -73,6 +73,15 @@ const addBlog = async (blogObject) => {
   flashNotificationMsg(`a new blog '${addedBlog.title}' by '${addedBlog.author}' added`, false)
 }
 
+const updateBlog = async (blogObject) => {
+  const returnedBlog = await blogService.update(blogObject)
+  setBlogs(
+    blogs.map(blog => blog.id === returnedBlog.id
+    ? returnedBlog
+    : blog)
+  )
+}
+
   if (user === null) {
     return (
       <div>
@@ -97,7 +106,7 @@ const addBlog = async (blogObject) => {
         />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
       )}
     </div>
   )
