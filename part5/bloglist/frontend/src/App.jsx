@@ -87,7 +87,7 @@ const addBlog = async (blogObject) => {
     <div>
       <h2>blogs</h2>
       <Notification message={notificationMsg.msg} isError={notificationMsg.isError} />
-      <div>{user.name} logged in
+      <div>{user.name} logged in&nbsp;
         <button onClick={handleLogout} >logout</button>
       </div>
       <br />
