@@ -84,6 +84,15 @@ const updateBlog = async (blogObject) => {
   )
 }
 
+const deleteBlog = async (blogObject) => {
+  await blogService.remove(blogObject)
+  setBlogs(
+    blogs
+    .filter(blog => blog.id !== blogObject.id)
+    .sort((a, b) => b.likes - a.likes)
+  )
+}
+
   if (user === null) {
     return (
       <div>
@@ -108,7 +117,7 @@ const updateBlog = async (blogObject) => {
         />
       </Togglable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUsername={user.username} />
       )}
     </div>
   )

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, currentUsername }) => {
   const [visible, setVisible] = useState(false)
-  
+
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -10,7 +10,8 @@ const Blog = ({ blog, updateBlog }) => {
     borderWidth: 1,
     marginBottom: 5
   }
-  const visibility = { display: visible ? '' : 'none' }
+  const fullVisibility = { display: visible ? '' : 'none' }
+  const removeButtonStyle = { display: currentUsername === blog.user.username ? '' : 'none' }
 
   const toggleVisibility = () => {
     setVisible(!visible)
@@ -21,7 +22,14 @@ const Blog = ({ blog, updateBlog }) => {
     blog = { ...blog, likes: blog.likes+1 }
     
     updateBlog(blog)
-}
+  }
+
+  const removeBlog = (event) => {
+    event.preventDefault()
+    if (window.confirm(`Remove blog '${blog.title}' by '${blog.author}'`)) {
+      deleteBlog(blog)
+    }
+  }
 
   return (
     <div style={blogStyle}>
@@ -29,7 +37,7 @@ const Blog = ({ blog, updateBlog }) => {
         {blog.title} {blog.author}&nbsp;
         <button onClick={toggleVisibility}>{visible ? "hide" : "show"}</button>
       </div>
-      <div style={visibility}>
+      <div style={fullVisibility}>
         <div>{blog.url}</div>
         <form onSubmit={addLike}>
           <div>likes {blog.likes}&nbsp;
@@ -37,6 +45,9 @@ const Blog = ({ blog, updateBlog }) => {
           </div>
         </form>
         <div>{blog.user.name}</div>
+        <form onSubmit={removeBlog}>
+          <button style={removeButtonStyle}>remove</button>
+        </form>
       </div>
     </div>
   )
