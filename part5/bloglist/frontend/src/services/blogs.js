@@ -39,4 +39,4 @@ const remove = async blogObj => {
   return response.data
 }
 
-export default { getAll, create, setToken, update, remove}
+export default { getAll, create, setToken, update, remove }
